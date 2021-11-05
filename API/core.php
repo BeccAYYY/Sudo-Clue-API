@@ -4,8 +4,7 @@
     require("SessionHandler.php");
     $session_handler = new dbSessionHandler();
     require("database.php");
-    $db = new database($session_handler->pdo);
-    header('Content-Type: application/json; charset=utf-8');
+    //header('Content-Type: application/json; charset=utf-8');
     //The default response if none of the cases are triggered to change it:
     $response = [400, ["Message" => "Invalid Request"]];
 
@@ -13,10 +12,12 @@
     if (isset($_GET["action"])) {
         switch ($_GET["action"]) {
             case "login-check": 
-                $response = $db->loginCheck();
         }
     }
 
+    $values = ["username" => "The first success", "password" => "password123", "role" => "user"];
+    $data_array = ["values" => $values];
+    $db = new database($session_handler->pdo, "insert", "users", $data_array);
 
     
     http_response_code($response[0]);
