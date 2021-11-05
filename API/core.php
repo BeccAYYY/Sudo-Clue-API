@@ -4,6 +4,7 @@
     require("SessionHandler.php");
     $session_handler = new dbSessionHandler();
     require("database.php");
+    require("validation.php");
     //header('Content-Type: application/json; charset=utf-8');
     //The default response if none of the cases are triggered to change it:
     $response = [400, ["Message" => "Invalid Request"]];
@@ -15,9 +16,27 @@
         }
     }
 
-    $values = ["username" => "The first success", "password" => "password123", "role" => "user"];
-    $data_array = ["values" => $values];
-    $db = new database($session_handler->pdo, "insert", "users", $data_array);
+    /*$values = [
+        "username" => "WinnerGuy"
+    ];
+    $columns = "*";
+    $where = [
+        "clause" => "`id` = :wid", 
+        "params" => [
+            "wid" => 1
+            ]
+        ];
+    $data_array = [
+        "where" => $where
+    ];
+    $db = new database(
+        $session_handler->pdo, 
+        "delete", 
+        "users", 
+        $data_array
+    );
+    var_dump($db->row_count);*/
+    $test = new validation($session_handler->pdo, "inprogress", "id", "2");
 
     
     http_response_code($response[0]);
