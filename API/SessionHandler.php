@@ -59,7 +59,7 @@ public function read($id) {
 
 public function write($id, $data) {
     $lastUpdate = time();
-    $query = "REPLACE INTO `sessions` (`id`, `data`, `lastUpdate`) VALUES (:id, :data, :lastUpdate)";
+    $query = "INSERT INTO `sessions` (`id`, `data`, `lastUpdate`) VALUES (:id, :data, :lastUpdate) ON DUPLICATE KEY UPDATE `id` = :id, `data` = :data, `lastUpdate` = :lastUpdate";
     $stmt = $this->pdo->prepare($query);
     $stmt->bindParam(":id", $id);
     $stmt->bindParam(":data", $data);

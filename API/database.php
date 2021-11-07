@@ -27,16 +27,7 @@ class database {
         if (isset($data_array["select"])) {
             $this->select = $data_array["select"];
         }
-
-        if ($statement_type == "insert") {
-            $this->insert();
-        } elseif ($statement_type == "select") {
-            $this->select();
-        }  elseif ($statement_type == "update") {
-            $this->update();
-        } elseif ($statement_type == "delete") {
-            $this->delete();
-        }
+        $this->$statement_type();
     }
 
     function insert() {
@@ -68,11 +59,14 @@ class database {
 
     function update() {
         $query="UPDATE `" . $this->table_name . "` SET " . $this->setString() . " WHERE ". $this->where["clause"];
+        echo $query;
         $stmt = $this->pdo->prepare($query);
         foreach($this->where["params"] as $k => &$v) {
+            echo "/nk = $k and v = $v";
             $stmt->bindParam($k, $v);
         }
         foreach($this->values as $k => &$v) {
+            echo "/nk = $k and v = $v";
             $stmt->bindParam(":$k", $v);
         }
         $this->result = $stmt->execute() or die(print_r($stmt->errorInfo(),true));

@@ -79,8 +79,17 @@ class validation {
     ];
 
     protected $actions = [
-        "login-check",
-        "other actions"
+        "login_check",
+        "username_exists",
+        "get_user_details",
+        "register",
+        "login",
+        "update_user_details",
+        "new_puzzle",
+        "update_puzzle_progress",
+        "complete_puzzle",
+        "get_leaderboard",
+        "delete_account"
     ];
 
     //Function that runs upon instantiation of the class.
@@ -115,14 +124,14 @@ class validation {
     function integer() {
         if (gettype($this->value) == "string") {
             if ($this->value != (string) (int) $this->value) {
-                $this->error = "Invalid format.";
+                $this->error = "Invalid format (string contains characters aside from numbers).";
                 return false;
             } else {
                 $this->value = (int) $this->value;
             }
         }
         if (gettype($this->value) !== "integer") {
-            $this->error = "Invalid format.";
+            $this->error = "Invalid format (data type not string or integer).";
             return false;
         }
         return true;
@@ -170,14 +179,18 @@ class validation {
         if (preg_match("/^[0-9]{81}$/", $this->value)) {
             return true;
         }
-        $this->error = "Invalid format.";
+        $this->error = "Invalid format for filled squares.";
         return false;
     }
 
     function filledCandidates() {
         $json = json_decode($this->value);
-        if (gettype($this->value) == "string" and json_last_error() === JSON_ERROR_NONE) {
+        if (gettype($this->value) == "string" and json_last_error() === JSON_ERROR_NONE and count($json) == 9) {
             foreach($json as $row) {
+                if (count($row) !== 9) {
+                    $this->error = "Invalid format for filled candidates.";
+                    return false;
+                }
                 foreach ($row as $cell) {
                     if (gettype($cell) === "array" and $cell) {
                         $last_candidate = 0;
@@ -193,7 +206,7 @@ class validation {
             }
             return true;
         }
-        $this->error = "Invalid format.";
+        $this->error = "Invalid format for filled candidates.";
         return false;
     }
 
@@ -235,7 +248,7 @@ class validation {
                 return true;
             }
         }
-        $this->error = "Inavlid format.";
+        $this->error = "Inavlid time format.";
         return false;
     }
 
@@ -245,7 +258,7 @@ class validation {
                 return true;
             }
         }
-        $this->error = "Inavlid format.";
+        $this->error = "Inavlid hint format.";
         return false;
     }
 
@@ -267,7 +280,7 @@ class validation {
                 return true;
             }
         }
-        $this->error = "Inavlid format.";
+        $this->error = "Inavlid clue format.";
         return false;
     }
 
@@ -280,7 +293,7 @@ class validation {
     }*/
 
     function username() {
-        if (preg_match("/^([0-9]|[a-z]|[A-Z]|[ -_]){1,40}$/", $this->value)) {
+        if (preg_match("/^([0-9]|[a-z]|[A-Z]|[ \-_]){1,40}$/", $this->value)) {
             return true;
         }
         $this->error = "Please enter a username containing only letters, numbers and special characters (- or _)";

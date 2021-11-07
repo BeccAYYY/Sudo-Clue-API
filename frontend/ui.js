@@ -8,7 +8,7 @@ fetch("../API/core.php?action=login_check")
 })*/
 
 
-fetch("../API/core.php?action=username_exists&username=test")
+fetch("../API/core.php?action=fuckyou&username=test*")
 .then(response => response.json())
 .then(data => {
     test.innerHTML = data.Message;
