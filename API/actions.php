@@ -1,6 +1,6 @@
 <?php
 
-
+require("functions.php");
 /* $values = [
         "username" => "WinnerGuy",
         "password" => "abc123",
@@ -43,9 +43,14 @@
         if (isset($db->row[0]) and is_null($db->row[0]["loggedUser"])) {
             create_guest($pdo);
             return [401, ["Message" => "You are not currently logged in."]];
-        } else {
+        } elseif (get_user_role($pdo, $db->row[0]["loggedUser"]) == "guest") {
+            $_SESSION["userID"] = $db->row[0]["loggedUser"];
+            return [401, ["Message" => "You are not currently logged in."]];
+        } elseif (get_user_role($pdo, $db->row[0]["loggedUser"]) == "user") {
+            $_SESSION["userID"] = $db->row[0]["loggedUser"];
             return [200, ["Message" => "You are logged in."]];
         }
+        return [500, ["Message" => "Server Error"]];
     }
 
     function username_exists($pdo) {
@@ -73,11 +78,26 @@
     }
 
     function get_user_details($pdo) {
-        //username
-        //settings
+        $data_array = [
+            "columns" => [
+                "username",
+                "dateCreated",
+                "methods",
+                "minimumClues",
+                "colour"
+            ],
+            "where" => [
+                "clause" => "id = :wid",
+                "params" => [
+                    ":wid" => $_SESSION["userID"]
+                ]
+            ]
+        ];
+        $user = new database($pdo, "select", "users", $data_array);
+
         //games completed
         //average time
-
+        return [200, ["Message" => "Test", "User" => $user->row[0]]];
     }
 
     function register() {
@@ -108,73 +128,11 @@
 
     }
 
-    function delete_accoun() {
+    function delete_account() {
 
     }
 
-    function create_guest($pdo) {
-        do {
-            $guest_name = "Guest" . rand(10000, 999999);
-            $taken_name = check_if_username_exists($pdo, $guest_name);
-        } while ($taken_name);
-        create_user($pdo, $guest_name, "n/a", "guest", "r", 40, "default");
-        $db = new database($pdo, "select", "users", [
-            "columns" => ["id"],
-            "where" => [
-                "clause" => "username = :wusername",
-                "params" => [
-                    ":wusername" => $guest_name
-                ]
-            ]
-        ]);
-        $id = $db->row[0]["id"];
-        $insert = new database($pdo, "update", "sessions", [
-            "values" => [
-                "loggedUser" => $id
-            ],
-            "where" => [
-                "clause" => "id = :wid",
-                "params" => [
-                    ":wid" => (string) session_id()
-                ]
-            ]
-        ]);
-    }
-
-    function check_if_username_exists($pdo, $username) {
-        $validation = new validation($pdo, "users", "username", $username);
-        if (!$validation->result) {
-            return [400, ["Message" => $validation->error]];
-        }
-        $data_array = [
-            "where" => [
-                "clause" => "username = :wusername",
-                "params" => [
-                    ":wusername" => $username
-                ]
-            ]
-        ];
-        $db = new database($pdo, "select", "users", $data_array);
-        if (count($db->row)) {
-            return true;
-        } 
-        return false;
-    }
-
-    function create_user($pdo, $username, $password, $role, $methods, $minimumClues, $colour) {
-        $values = [
-            "username" => $username,
-            "password" => $password,
-            "role" => $role,
-            "methods" => $methods,
-            "minimumClues" => $minimumClues,
-            "colour" => $colour
-        ];
-        $data_array = [
-            "values" => $values
-        ];
-        $db = new database($pdo, "insert", "users", $data_array);
-    }
+    
 
 
 ?>
