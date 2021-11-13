@@ -95,9 +95,37 @@ require("functions.php");
         ];
         $user = new database($pdo, "select", "users", $data_array);
 
-        //games completed
-        //average time
-        return [200, ["Message" => "Test", "User" => $user->row[0]]];
+        $data_array = [
+            "columns" => [
+                "COUNT(*) as totalGames"
+            ],
+            "where" => [
+                "clause" => "userID = :wid",
+                "params" => [
+                    ":wid" => $_SESSION["userID"]
+                ]
+            ]
+        ];
+        $total_games = new database($pdo, "select", "puzzlehistory", $data_array);
+
+        $data_array = [
+            "columns" => [
+                "COUNT(*) AS completedGames",
+                "AVG(time) AS averageTime",
+                "MIN(time) AS bestTime"
+            ],
+            "where" => [
+                "clause" => "userID = :wid AND status = 'completed'",
+                "params" => [
+                    ":wid" => $_SESSION["userID"]
+                ]
+            ]
+        ];
+        $completed_games = new database($pdo, "select", "puzzlehistory", $data_array);
+
+        $data = array_merge($user->row[0], $total_games->row[0], $completed_games->row[0]);
+
+        return [200, $data];
     }
 
     function register() {

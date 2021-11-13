@@ -53,7 +53,7 @@ class database {
             }
         }
         $this->result = $stmt->execute() or die(print_r($stmt->errorInfo(),true));
-        $this->row = $stmt->fetchAll();
+        $this->row = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $this->row_count = $stmt->rowCount();
     }
 
@@ -93,9 +93,9 @@ class database {
         $string = "";
         foreach($this->columns as $c) {
             if ($c !== $last_value) {
-                $string .= "`$c`, ";
+                $string .= "$c, ";
             } else {
-                $string .= "`$c`";
+                $string .= "$c";
             }
         }
         return $string;
