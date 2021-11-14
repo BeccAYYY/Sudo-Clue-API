@@ -29,7 +29,7 @@ require("functions.php");
     echo $test->error;*/
 
     function login_check($pdo) {
-        $id = session_id();
+        $id = (string) session_id();
         $data_array = [
             "columns" => ["loggedUser"],
             "where" => [
@@ -40,7 +40,6 @@ require("functions.php");
             ]
         ];
         $db = new database($pdo, "select", "sessions", $data_array);
-        var_dump($db->row);
         if (isset($db->row[0]) and is_null($db->row[0]["loggedUser"])) {
             create_guest($pdo);
             return [401, ["Message" => "You are not currently logged in."]];
@@ -168,7 +167,14 @@ require("functions.php");
     }
 
     function login() {
+        
+    }
 
+    function logout($pdo) {
+        if (create_guest($pdo)) {
+            return [200, ["Message" => "Successfully logged out."]];
+        }
+        return [500, ["Message" => "Server Error"]];
     }
 
     function update_user_details() {

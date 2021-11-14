@@ -84,6 +84,7 @@ class validation {
         "get_user_details",
         "register",
         "login",
+        "logout",
         "update_user_details",
         "new_puzzle",
         "update_puzzle_progress",

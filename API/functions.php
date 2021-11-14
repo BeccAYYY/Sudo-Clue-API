@@ -16,7 +16,7 @@ function create_guest($pdo) {
             ]
         ]);
         $id = $db->row[0]["id"];
-        new database($pdo, "update", "sessions", [
+        $update = new database($pdo, "update", "sessions", [
             "values" => [
                 "loggedUser" => $id
             ],
@@ -28,6 +28,7 @@ function create_guest($pdo) {
             ]
         ]);
         $_SESSION["userID"] = $id;
+        return $update->result;
     }
 
     function check_if_username_exists($pdo, $username) {
