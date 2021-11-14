@@ -40,13 +40,14 @@ require("functions.php");
             ]
         ];
         $db = new database($pdo, "select", "sessions", $data_array);
+        var_dump($db->row);
         if (isset($db->row[0]) and is_null($db->row[0]["loggedUser"])) {
             create_guest($pdo);
             return [401, ["Message" => "You are not currently logged in."]];
-        } elseif (get_user_role($pdo, $db->row[0]["loggedUser"]) == "guest") {
+        } elseif (isset($db->row[0]) and get_user_role($pdo, $db->row[0]["loggedUser"]) == "guest") {
             $_SESSION["userID"] = $db->row[0]["loggedUser"];
             return [401, ["Message" => "You are not currently logged in."]];
-        } elseif (get_user_role($pdo, $db->row[0]["loggedUser"]) == "user") {
+        } elseif (isset($db->row[0]) and get_user_role($pdo, $db->row[0]["loggedUser"]) == "user") {
             $_SESSION["userID"] = $db->row[0]["loggedUser"];
             return [200, ["Message" => "You are logged in."]];
         }
@@ -128,8 +129,42 @@ require("functions.php");
         return [200, $data];
     }
 
-    function register() {
-
+    function register($pdo) {
+        if (get_user_role($pdo, $_SESSION["userID"]) !== "guest") {
+            return [403, ["Message" => "You are already logged in."]];
+        }
+        
+        $username_exists = check_if_username_exists($pdo, $_POST["username"]);
+        if ($username_exists === true) {
+            return [403, ["Message" => "Username already exists."]];
+        } elseif ($username_exists) {
+            return [400, ["Message" => $username_exists]];
+        }
+        $pass_val = new validation($pdo, "users", "password", $_POST["password"]);
+        if (!$pass_val->result) {
+            return [400, ["Message" => $pass_val->error]];
+        }
+        if ($_POST["password"] !== $_POST["password2"]) {
+            return [400, ["Message" => "Passwords do not match."]];
+        }
+        $data_array = [
+            "values" => [
+                "username" => $_POST["username"],
+                "password" => password_hash($_POST["password"], PASSWORD_DEFAULT),
+                "role" => "user"
+            ],
+            "where" => [
+                "clause" => "id = :wid",
+                "params" => [
+                    ":wid" => $_SESSION["userID"]
+                ]
+            ]
+        ];
+        $update = new database($pdo, "update", "users", $data_array);
+        if ($update->result) {
+            return [200, ["Message" => "User created"]];
+        }
+        return [500, ["Message" => "Server issue. Please try again later."]];
     }
 
     function login() {

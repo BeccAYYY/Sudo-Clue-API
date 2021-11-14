@@ -59,14 +59,11 @@ class database {
 
     function update() {
         $query="UPDATE `" . $this->table_name . "` SET " . $this->setString() . " WHERE ". $this->where["clause"];
-        echo $query;
         $stmt = $this->pdo->prepare($query);
         foreach($this->where["params"] as $k => &$v) {
-            echo "/nk = $k and v = $v";
             $stmt->bindParam($k, $v);
         }
         foreach($this->values as $k => &$v) {
-            echo "/nk = $k and v = $v";
             $stmt->bindParam(":$k", $v);
         }
         $this->result = $stmt->execute() or die(print_r($stmt->errorInfo(),true));

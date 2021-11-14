@@ -28,7 +28,7 @@ public function __construct() {
         session_regenerate_id(true);
         $_SESSION['CREATED'] = time();
     }
-    setcookie("PHPSESSID", session_id(), time() + $this->expiry, "/");
+    setcookie("PHPSESSID", session_id(), time() + $this->expiry, "*");
 }
 
 public function open() {

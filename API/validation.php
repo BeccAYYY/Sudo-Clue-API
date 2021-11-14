@@ -301,7 +301,7 @@ class validation {
     }
 
     function password() {
-        if (preg_match("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,}$", $this->value)) {
+        if (preg_match("/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,}$/", $this->value)) {
             //Hash password
             return true;
         }

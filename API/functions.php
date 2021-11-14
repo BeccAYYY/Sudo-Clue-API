@@ -33,7 +33,7 @@ function create_guest($pdo) {
     function check_if_username_exists($pdo, $username) {
         $validation = new validation($pdo, "users", "username", $username);
         if (!$validation->result) {
-            return [400, ["Message" => $validation->error]];
+            return $validation->error;
         }
         $data_array = [
             "where" => [
