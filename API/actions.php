@@ -30,6 +30,7 @@ require("functions.php");
 
     function login_check($pdo) {
         $id = (string) session_id();
+        echo "session id = " . (string) session_id();
         $data_array = [
             "columns" => ["loggedUser"],
             "where" => [
@@ -50,7 +51,7 @@ require("functions.php");
             $_SESSION["userID"] = $db->row[0]["loggedUser"];
             return [200, ["Message" => "You are logged in."]];
         }
-        return [500, ["Message" => "Server Error"]];
+        return [500, ["Message" => "Server error."]];
     }
 
     function username_exists($pdo) {
@@ -129,6 +130,13 @@ require("functions.php");
     }
 
     function register($pdo) {
+        if (!isset($_POST["username"]) or !isset($_POST["password"]) or !isset($_POST["password2"])) {
+            return [400, ["Message" => "Please fill all fields."]];
+        }
+        $validation = new validation($pdo, "users", "username", $_POST["username"]);
+        if (!$validation->result) {
+            return [400, ["Message" => $validation->error]];
+        }
         if (get_user_role($pdo, $_SESSION["userID"]) !== "guest") {
             return [403, ["Message" => "You are already logged in."]];
         }
@@ -166,19 +174,60 @@ require("functions.php");
         return [500, ["Message" => "Server issue. Please try again later."]];
     }
 
-    function login() {
+    function login($pdo) {
+        if (!isset($_POST["username"]) or !isset($_POST["password"])) {
+            return [400, ["Message" => "Please fill all fields."]];
+        }
+        $un_val = new validation($pdo, "users", "username", $_POST["username"]);
+        if (!$un_val->result) {
+            return [400, ["Message" => $un_val->error]];
+        }
+        $pw_val = new validation($pdo, "users", "password", $_POST["password"]);
+        if (!$pw_val->result) {
+            return [400, ["Message" => $pw_val->error]];
+        }
+        if (!check_if_username_exists($pdo, $_POST["username"])) {
+            return [400, ["Message" => "Invalid details."]];
+        }
+        $db_password = get_user_password($pdo, $_POST["username"]);
+        if (!$db_password) {
+            return [500, ["Message" => "Server error."]];
+        }
+        if (!password_verify($_POST["password"], $db_password)) {
+            return [400, ["Message" => "Invalid details."]];
+        }
+        $id = get_user_id($pdo, $_POST["username"]);
+        if (!$id) {
+            return [500, ["Message" => "Server error."]];
+        }
         
+        $update = new database($pdo, "update", "sessions", [
+            "values" => [
+                "loggedUser" => $id
+            ],
+            "where" => [
+                "clause" => "id = :wid",
+                "params" => [
+                    ":wid" => (string) session_id()
+                ]
+            ]
+        ]);
+        if (!$update->result) {
+            return [500, ["Message" => "Server error."]];
+        }
+        $_SESSION["userID"] = $id;
+        return [200, ["Message" => "Successfully logged in."]];
     }
 
     function logout($pdo) {
         if (create_guest($pdo)) {
             return [200, ["Message" => "Successfully logged out."]];
         }
-        return [500, ["Message" => "Server Error"]];
+        return [500, ["Message" => "Server error."]];
     }
 
     function update_user_details() {
-
+        
     }
 
     function new_puzzle() {

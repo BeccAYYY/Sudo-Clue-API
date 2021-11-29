@@ -28,14 +28,12 @@ function create_guest($pdo) {
             ]
         ]);
         $_SESSION["userID"] = $id;
+        echo "id = ". $id;
+        echo "session id = " . (string) session_id();
         return $update->result;
     }
 
     function check_if_username_exists($pdo, $username) {
-        $validation = new validation($pdo, "users", "username", $username);
-        if (!$validation->result) {
-            return $validation->error;
-        }
         $data_array = [
             "where" => [
                 "clause" => "username = :wusername",
@@ -84,5 +82,49 @@ function create_guest($pdo) {
         $db = new database($pdo, "select", "users", $data_array);
         return $db->row[0]["role"];
     }
+
+    function get_user_password($pdo, $username) {
+        $columns = [
+            "password"
+        ];
+        $where = [
+            "clause" => "`username` = :wusername",
+            "params" => [
+                ":wusername" => $username
+            ]
+        ];
+        $data_array = [
+            "where" => $where,
+            "columns" => $columns
+        ];
+        $db = new database($pdo, "select", "users", $data_array);
+        if (count($db->row) == 1) {
+            return $db->row[0]["password"];
+        }
+        return false;
+    }
+
+    function get_user_id($pdo, $username) {
+        $columns = [
+            "id"
+        ];
+        $where = [
+            "clause" => "`username` = :wusername",
+            "params" => [
+                ":wusername" => $username
+            ]
+        ];
+        $data_array = [
+            "where" => $where,
+            "columns" => $columns
+        ];
+        $db = new database($pdo, "select", "users", $data_array);
+        if (count($db->row) == 1) {
+            return $db->row[0]["id"];
+        }
+        return false;
+    }
+
+
 
     ?>
