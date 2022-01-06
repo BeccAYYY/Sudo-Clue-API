@@ -2,6 +2,8 @@
 
 class dbSessionHandler {
 
+
+    //I instantiated the database here because it is called once with every request
 public $pdo;
 protected $dsn = "mysql:dbname=sudoclue;host=localhost";
 protected $db_username = "root";
@@ -21,6 +23,8 @@ public function __construct() {
         array(&$this, "destroy"), 
         array(&$this, "gc")
     );
+    
+    //session is started when the dbSessionHandler class is called.
     session_start();
     if (!isset($_SESSION['CREATED'])) {
         $_SESSION['CREATED'] = time();

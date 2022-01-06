@@ -28,8 +28,6 @@ function create_guest($pdo) {
             ]
         ]);
         $_SESSION["userID"] = $id;
-        echo "id = ". $id;
-        echo "session id = " . (string) session_id();
         return $update->result;
     }
 

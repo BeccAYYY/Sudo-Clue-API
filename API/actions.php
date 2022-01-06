@@ -27,10 +27,9 @@ require("functions.php");
 
     /*$test = new validation($session_handler->pdo, "inprogress", "id", "2aaaaa");
     echo $test->error;*/
-
+//Checks if the current session has a login associated with it (including a guest login), and makes a guest account if not.
     function login_check($pdo) {
         $id = (string) session_id();
-        echo "session id = " . (string) session_id();
         $data_array = [
             "columns" => ["loggedUser"],
             "where" => [
@@ -200,7 +199,6 @@ require("functions.php");
         if (!$id) {
             return [500, ["Message" => "Server error."]];
         }
-        
         $update = new database($pdo, "update", "sessions", [
             "values" => [
                 "loggedUser" => $id
@@ -249,8 +247,5 @@ require("functions.php");
     function delete_account() {
 
     }
-
-    
-
 
 ?>
