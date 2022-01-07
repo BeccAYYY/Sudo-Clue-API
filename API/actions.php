@@ -265,7 +265,7 @@ require("functions.php");
         if (!$update->result) {
             return [500, ["Message" => "Server error."]];
         }
-        return [200, ["Message" => "Username updated successfully", "Data" => get_user_details($pdo)[1], "ROWS" => $update->row_count]];
+        return [200, ["Message" => "Username updated successfully", "Data" => get_user_details($pdo)[1]]];
     }
 
     function update_password($pdo) {
@@ -284,6 +284,10 @@ require("functions.php");
         if (!$db_password) {
             return [500, ["Message" => "Server error."]];
         }
+        $old_pass_val = new validation($pdo, "users", "password", $_POST["old-password"]);
+        if (!$pass_val->result) {
+            return [400, ["Message" => $pass_val->error]];
+        }
         if (!password_verify($_POST["old-password"], $db_password)) {
             return [400, ["Message" => "Invalid details."]];
         }
@@ -298,7 +302,7 @@ require("functions.php");
             "where" => [
                 "clause" => "id = :wid",
                 "params" => [
-                    ":wid" => (string) session_id()
+                    ":wid" => $_SESSION["userID"]
                 ]
             ]
         ]);
