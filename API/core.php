@@ -32,8 +32,6 @@
 
 
 // Every request from the front end has a URL parameter with a key of "action"
-
-
     if (isset($_GET["action"])) {
         //The validation checks that the action is one from the set list
         $validation = new validation($pdo, "logs", "action", $_GET["action"]);
@@ -45,8 +43,7 @@
         }
 
     } else {
-        $response = register($pdo);
-        // $response = [400, ["Message" => "No action set."]];
+        $response = [400, ["Message" => "No action set."]];
     }
 
     http_response_code($response[0]);
@@ -54,4 +51,4 @@
 
 
     
-    ?>
+?>
