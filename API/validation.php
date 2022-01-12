@@ -75,6 +75,9 @@ class validation {
             "methods" => "methods",
             "minimumClues" => "clues",
             "colour" => "colour"
+        ],
+        "other" => [
+            "ip" => "admin_ip_check"
         ]
     ];
 
@@ -91,7 +94,17 @@ class validation {
         "update_puzzle_progress",
         "complete_puzzle",
         "get_leaderboard",
-        "delete_account"
+        "delete_account",
+        "admin_create_user",
+        "admin_get_users",
+        "delete_user",
+        "admin_edit_user",
+        "admin_login",
+        "admin_login_check"
+    ];
+
+    protected $ips = [
+        "127.0.0.1"
     ];
 
     //Function that runs upon instantiation of the class.
@@ -308,6 +321,14 @@ class validation {
             return true;
         }
         $this->error = "Password must contain one number, once special character, one capital and one lowercase letter";
+        return false;
+    }
+
+    function admin_ip_check() {
+        if (in_array($this->value, $this->ips, true)) {
+            return true;
+        }
+        $this->error = "Invalid ip.";
         return false;
     }
 

@@ -123,6 +123,4 @@ function create_guest($pdo) {
         return false;
     }
 
-
-
     ?>

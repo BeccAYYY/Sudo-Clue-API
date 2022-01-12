@@ -6,6 +6,7 @@ class database {
     private $table_name;
     private $columns;
     private $values;
+    private $join;
     private $where;
     public $result;
     public $row_count;
@@ -23,6 +24,9 @@ class database {
         }
         if (isset($data_array["where"])) {
             $this->where = $data_array["where"];
+        }
+        if (isset($data_array["join"])) {
+            $this->join = $data_array["join"];
         }
         if (isset($data_array["select"])) {
             $this->select = $data_array["select"];
@@ -43,6 +47,9 @@ class database {
 
     function select() {
         $query="SELECT " . $this->columnsString() . " FROM `" . $this->table_name . "`";
+        if (isset($this->join)) {
+            $query .= $this->join["type"] . " JOIN " . $this->join["table"] . " ON " . $this->join["firstColumn"] . " = " . $this->join["secondColumn"];
+        }
         if (isset($this->where)) {
             $query .= " WHERE " . $this->where["clause"];
         }
